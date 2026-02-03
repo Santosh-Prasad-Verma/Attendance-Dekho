@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Sucks</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        /* ==============
+          Global Styles
+         ================ */
+        :root {
+            --primary: #ff4b8b;
+            --primary-hover: #ff1a75;
+            --background: #1a1a2e;
+            --card: #212134;
+            --text: #e2e8f0;
+            --text-secondary: #a0aec0;
+            --border: #2d2d44;
+            --success: #00ff88;
+            --success-light: rgba(0, 255, 136, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        /* ==========
+        Scroll Bar 
+        ============*/
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 255, 136, 0.1)5;
+        }
+
+        /* Firefox */
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: #2d2d44 rgba(0, 255, 136, 0.1);
+        }
+
+        body {
+            overflow: auto;
+        }
+
+        body::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        body::-webkit-scrollbar-track {
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+
+        body {
+            background-color: var(--background);
+            background-image:
+                radial-gradient(at 40% 20%, rgba(255, 75, 139, 0.1) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, rgba(0, 255, 136, 0.1) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, rgba(147, 51, 234, 0.1) 0px, transparent 50%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--text);
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* =============
+         Loading Screen 
+         =============== */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeOut 1s ease 2s forwards;
+        }
+
+        .loading-text {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #ff4b8b, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .container {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 0 20px rgba(255, 75, 139, 0.2);
+            width: 100%;
+            max-width: 700px;
+            position: relative;
+            overflow: hidden;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: float 6s ease-in-out infinite, containerEnter 0.8s ease-out 2.2s forwards;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 75, 139, 0.1), transparent);
+            animation: rotate 20s linear infinite;
+            z-index: -1;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary) 0%, #9333ea 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .day-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .input-group {
+            margin-bottom: 1.25rem;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            background: var(--background);
+            color: var(--text);
+        }
+
+        input:focus {
+            outline: none;
+        }
+
+        input:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 75, 139, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 0.875rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(255, 75, 139, 0.4);
+        }
+
+        .alert {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: var(--success-light);
+            color: var(--success);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            animation: flipInX 0.6s ease-out;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .progress-container {
+            margin: 1.5rem 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid var(--border);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, #9333ea 100%);
+            transition: width 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2),
+                0 0 15px rgba(255, 75, 139, 0.4);
+        }
+
+        .sarcastic-message {
+            font-style: italic;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes containerEnter {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes flipInX {
+            from {
+                transform: perspective(400px) rotateX(90deg);
+                opacity: 0;
+            }
+
+            to {
+                transform: perspective(400px) rotateX(0deg);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .loading-text {
+                font-size: 1.75rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loading-screen">
+        <div class="loading-text">aao attendance dekh lo...</div>
+    </div>
+
+    <div class="container">
+        <h2>Welcome Losers</h2>
+
+        <div class="day-inputs" id="weeklySchedule"></div>
+
+        <div class="progress-container">
+            <label>Your "Dedication" Level</label>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+            <div class="sarcastic-message" id="progressMessage">Wow, such empty</div>
+        </div>
+
+        <div class="input-group">
+            <label for="totalSlots">Total Slot (present + absent)</label>
+            <input type="number" id="totalSlots" min="0" placeholder="How many lectures you put your ass down?">
+        </div>
+
+        <div class="input-group">
+            <label for="presentSlots">Actually Attended (Apparently)</label>
+            <input type="number" id="presentSlots" min="0" placeholder="Be honest... or don't">
+        </div>
+
+        <div class="input-group">
+            <label for="targetPercentage">Dream Attendance %</label>
+            <input type="number" id="targetPercentage" min="0" max="100" placeholder="never be achieved">
+        </div>
+
+        <button onclick="calculateAttendance()">Calculate My Fate</button>
+        <div id="result" class="alert" style="display: none;"></div>
+    </div>
+
+    <script>
+        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const weeklySchedule = document.getElementById("weeklySchedule");
+        const schedule = {};
+
+        const dayMessages = {
+            "Monday": "New week, not new life.",
+            "Tuesday": "Not dead yet?",
+            "Wednesday": "Halfway to the grave.",
+            "Thursday": "Hope is a lie. Keep working.",
+            "Friday": "Weekend's almost here!",
+            "Saturday": "You made it! But for what?",
+        };
+
+        // Initialize day inputs
+        days.forEach(day => {
+            schedule[day] = 0;
+            let div = document.createElement("div");
+            div.classList.add("input-group");
+            div.innerHTML = `
+                <label>${day} (${dayMessages[day]})</label>
+                <input type="number" min="0" onchange="updateSchedule('${day}', this.value)" placeholder="How many?">
+            `;
+            weeklySchedule.appendChild(div);
+        });
+
+        // Loading screen handling
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                document.querySelector('.loading-screen').style.display = 'none';
+            }, 2500);
+        });
+
+        function updateSchedule(day, value) {
+            schedule[day] = parseInt(value) || 0;
+            updateProgressBar();
+        }
+
+        function updateProgressBar() {
+            const totalSlots = parseInt(document.getElementById("totalSlots").value) || 0;
+            const presentSlots = parseInt(document.getElementById("presentSlots").value) || 0;
+
+            if (totalSlots > 0) {
+                const percentage = (presentSlots / totalSlots) * 100;
+                document.getElementById("progressBar").style.width = `${Math.min(percentage, 100)}%`;
+
+                const progressMessage = document.getElementById("progressMessage");
+                if (percentage < 30) {
+                    progressMessage.innerHTML = "At least you're honest... you're the next billionair";
+                } else if (percentage < 60) {
+                    progressMessage.innerHTML = "could be worse... or better... but we want it worse";
+                } else if (percentage < 80) {
+                    progressMessage.innerHTML = "How did someone kiss this much ass to get here?";
+                } else {
+                    progressMessage.innerHTML = "Okay overachiever, now fuck off";
+                }
+            }
+        }
+
+        function calculateTotalWeeklyLectures() {
+            return Object.values(schedule).reduce((sum, count) => sum + count, 0);
+        }
+
+        function calculateAttendance() {
+            let totalSlots = parseInt(document.getElementById("totalSlots").value) || 0;
+            let presentSlots = parseInt(document.getElementById("presentSlots").value) || 0;
+            let targetPercentage = parseFloat(document.getElementById("targetPercentage").value) || 0;
+            let resultDiv = document.getElementById("result");
+
+            if (targetPercentage <= 0 || targetPercentage > 100) {
+                resultDiv.innerHTML = `Really? That's your target? Try again...`;
+                resultDiv.style.display = "block";
+                return;
+            }
+
+            updateProgressBar();
+
+            let A = targetPercentage / 100;
+            let X = (totalSlots * A - presentSlots) / (1 - A);
+
+            if (X <= 0) {
+                resultDiv.innerHTML = `
+                    <strong> Well, well, well...</strong><br>
+                    Look who's already achieved their target! Want a cookie??<br>
+                    Current Attendance: ${(presentSlots / totalSlots * 100).toFixed(2)}% (Show-off!)
+                `;
+            } else {
+                X = Math.ceil(X);
+                const weeklyLectures = calculateTotalWeeklyLectures();
+                const weeksNeeded = weeklyLectures > 0 ? Math.ceil(X / weeklyLectures) : Infinity;
+                const daysNeeded = weeklyLectures > 0 ? Math.ceil(X / (weeklyLectures / 7)) : Infinity;
+
+                resultDiv.innerHTML = `
+                    <strong style="color: var(--success);">Your Kundali 🃏</strong><br><br>
+                    <strong>Current Attendance:</strong> ${(presentSlots / totalSlots * 100).toFixed(2)}%<br>
+                    <strong>Additional lectures needed:</strong> ${X}<br>
+                    <strong>Estimated days needed:</strong> ${daysNeeded}<br>
+                    <strong>Estimated weeks needed:</strong> ${weeksNeeded}
+                `;
+            }
+
+            resultDiv.style.display = "block";
+            resultDiv.style.animation = 'none';
+            setTimeout(() => {
+                resultDiv.style.animation = '';
+            }, 10);
+        }
+
+        // Add input hover effects
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('mouseenter', () => {
+                input.style.transform = 'translateY(-2px)';
+                input.style.boxShadow = '0 5px 15px rgba(255, 75, 139, 0.2)';
+            });
+
+            input.addEventListener('mouseleave', () => {
+                input.style.transform = 'translateY(0)';
+                input.style.boxShadow = 'none';
+            });
+        });
+
+        document.getElementById("totalSlots").addEventListener("input", updateProgressBar);
+        document.getElementById("presentSlots").addEventListener("input", updateProgressBar);
+    </script>
+</body>
+
+</html>
