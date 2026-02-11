@@ -1,5 +1,7 @@
 <div align="center">
 
+![Attendance Dekho](Public/_.gif)
+
 # 🎓 Attendance Dekho
 ### *The Brutally Honest Attendance Calculator* 🤡
 
@@ -55,7 +57,7 @@ Because if your attendance is ugly, at least the app shouldn't be.
 
 ```bash
 # Step 1: Clone the repository
-git clone https://github.com/yourusername/attendance-dekho.git
+git clone https://github.com/Santosh-Prasad-Verma/Attendance-Dekho.git
 
 # Step 2: Open in browser
 cd attendance-dekho
