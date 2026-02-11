@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="Public/_.gif" alt="Attendance Dekho" width="400">
+<img src="Public/_.gif" alt="Attendance Dekho" width="300">
 
 # 🎓 Attendance Dekho
 ### *The Brutally Honest Attendance Calculator* 🤡
