@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="Public/_.gif" alt="Attendance Dekho" width="350">
+<img src="Public/Spongebob Squarepants Dancing Sticker - Find & Share on GIPHY.gif" alt="Attendance Dekho" width="300">
 
 # 🎓 Attendance Dekho
 
